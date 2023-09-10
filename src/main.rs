@@ -21,6 +21,7 @@ struct Cli {
     host: String,
 
     /// file_or_dir
+    #[clap(default_value_t = String::from("."))]
     file_or_dir: String,
 }
 

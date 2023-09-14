@@ -60,7 +60,11 @@ async fn main() -> std::io::Result<()> {
         path: path.to_string_lossy().to_string(),
     };
 
-    println!("rserve: http://{}:{}/", host, port);
+    let local_ip = local_ip_address::local_ip().unwrap();
+    println!("rserve:");
+    println!("http://{}:{}/", "localhost", port);
+    println!("http://{}:{}/", local_ip, port);
+    println!("http://{}:{}/", host, port);
 
     HttpServer::new(move || {
         let mut app = App::new().app_data(web::Data::new(app_data.clone())).wrap(

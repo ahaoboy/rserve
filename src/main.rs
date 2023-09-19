@@ -1,11 +1,11 @@
 #![feature(absolute_path)]
 
-use std::{path::PathBuf, str::FromStr};
+
 
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
 use actix_web::{
-    body::BoxBody, http::StatusCode, middleware::Logger, web, App, HttpRequest, HttpServer,
+    http::StatusCode, web, App, HttpRequest, HttpServer,
 };
 use clap::Parser;
 
@@ -40,7 +40,14 @@ async fn main() -> std::io::Result<()> {
         file_or_dir,
     } = cli.clone();
     let path = std::path::Path::new(&file_or_dir);
+    
+    if !path.exists(){
+        panic!("file_or_dir not found: {}", path.to_string_lossy());
+    }
+    
     let path = std::path::absolute(path).unwrap();
+
+
     let name = path
         .clone()
         .file_name()
@@ -80,19 +87,18 @@ async fn main() -> std::io::Result<()> {
         } else {
             app = app
                 .service(web::resource("/").route(web::get().to(
-                    |req: HttpRequest, data: web::Data<AppData>| async move {
+                    |_req: HttpRequest, data: web::Data<AppData>| async move {
                         let s = data.body.clone();
-                        let mut res =
-                            actix_web::HttpResponse::new(StatusCode::from_u16(200).unwrap())
-                                .set_body(s);
-                        res
+                        
+                        actix_web::HttpResponse::new(StatusCode::from_u16(200).unwrap())
+                                .set_body(s)
                     },
                 )))
                 .service(
-                    web::resource(&format!("/static/{}", name)).route(web::get().to(
+                    web::resource(format!("/static/{}", name)).route(web::get().to(
                         |req: HttpRequest, data: web::Data<AppData>| async move {
                             let s = data.path.to_string();
-                            let file = NamedFile::open(&s).unwrap();
+                            let file = NamedFile::open(s).unwrap();
                             file.into_response(&req)
                         },
                     )),

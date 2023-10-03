@@ -56,7 +56,7 @@ async fn main() -> std::io::Result<()> {
         .to_string();
     let body = format!(
         r"
-    <html><head><title>Index of /</title></head><body><h1>Index of /</h1><ul><li><a download href='/static/{}'>{}</a></li></ul></body>
+    <html><head><title>Index of /</title></head><body><h1>Index of /</h1><ul><li><a target='_blank' href='/static/{}'>{}</a></li></ul></body>
     </html>
     ",
         name, name

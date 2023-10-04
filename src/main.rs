@@ -41,11 +41,11 @@ async fn main() -> std::io::Result<()> {
     } = cli.clone();
     let path = std::path::Path::new(&file_or_dir);
     
+    let path = std::path::absolute(path).unwrap();
+
     if !path.exists(){
         panic!("file_or_dir not found: {}", path.to_string_lossy());
     }
-    
-    let path = std::path::absolute(path).unwrap();
 
 
     let name = path

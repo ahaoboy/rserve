@@ -567,6 +567,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "find_port"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "63c66607b303f09253b2611bc7a9a434c8b28cb652b56771e855fa62137f32da"
+
+[[package]]
 name = "flate2"
 version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1031,12 +1037,13 @@ checksum = "dbb5fb1acd8a1a18b3dd5be62d25485eb770e05afb408a9627d14d451bae12da"
 
 [[package]]
 name = "rserve"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "actix-cors",
  "actix-files",
  "actix-web",
  "clap",
+ "find_port",
  "local-ip-address",
 ]
 

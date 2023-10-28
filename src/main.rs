@@ -1,12 +1,8 @@
 #![feature(absolute_path)]
 
-
-
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
-use actix_web::{
-    http::StatusCode, web, App, HttpRequest, HttpServer,
-};
+use actix_web::{http::StatusCode, web, App, HttpRequest, HttpServer};
 use clap::Parser;
 
 #[derive(Parser, Debug, Clone)]
@@ -40,13 +36,14 @@ async fn main() -> std::io::Result<()> {
         file_or_dir,
     } = cli.clone();
     let path = std::path::Path::new(&file_or_dir);
-    
-    let path = std::path::absolute(path).unwrap();
 
-    if !path.exists(){
+    let path = std::path::absolute(path).unwrap();
+    
+    let port = find_port::find_port("127.0.0.1", port).expect("");
+
+    if !path.exists() {
         panic!("file_or_dir not found: {}", path.to_string_lossy());
     }
-
 
     let name = path
         .clone()
@@ -89,9 +86,8 @@ async fn main() -> std::io::Result<()> {
                 .service(web::resource("/").route(web::get().to(
                     |_req: HttpRequest, data: web::Data<AppData>| async move {
                         let s = data.body.clone();
-                        
-                        actix_web::HttpResponse::new(StatusCode::from_u16(200).unwrap())
-                                .set_body(s)
+
+                        actix_web::HttpResponse::new(StatusCode::from_u16(200).unwrap()).set_body(s)
                     },
                 )))
                 .service(

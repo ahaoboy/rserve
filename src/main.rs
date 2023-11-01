@@ -2,7 +2,11 @@
 
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
-use actix_web::{http::StatusCode, web, App, HttpRequest, HttpServer};
+use actix_web::{
+    http::{header, StatusCode},
+    web::{self, head},
+    App, HttpRequest, HttpServer,
+};
 use clap::Parser;
 
 #[derive(Parser, Debug, Clone)]
@@ -38,7 +42,7 @@ async fn main() -> std::io::Result<()> {
     let path = std::path::Path::new(&file_or_dir);
 
     let path = std::path::absolute(path).unwrap();
-    
+
     let port = find_port::find_port("127.0.0.1", port).expect("");
 
     if !path.exists() {
@@ -51,9 +55,12 @@ async fn main() -> std::io::Result<()> {
         .unwrap()
         .to_string_lossy()
         .to_string();
+    println!("{:?} {}", path, name);
     let body = format!(
         r"
-    <html><head><title>Index of /</title></head><body><h1>Index of /</h1><ul><li><a target='_blank' href='/static/{}'>{}</a></li></ul></body>
+    <html><head>
+    <meta charset='utf-8'>
+    <title>Index of /</title></head><body><h1>Index of /</h1><ul><li><a target='_blank' href='/static/{}'>{}</a></li></ul></body>
     </html>
     ",
         name, name
@@ -87,7 +94,8 @@ async fn main() -> std::io::Result<()> {
                     |_req: HttpRequest, data: web::Data<AppData>| async move {
                         let s = data.body.clone();
 
-                        actix_web::HttpResponse::new(StatusCode::from_u16(200).unwrap()).set_body(s)
+                        let resp = actix_web::HttpResponse::new(StatusCode::from_u16(200).unwrap());
+                        resp.set_body(s)
                     },
                 )))
                 .service(

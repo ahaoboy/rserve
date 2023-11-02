@@ -3,8 +3,8 @@
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
 use actix_web::{
-    http::{header, StatusCode},
-    web::{self, head},
+    http::StatusCode,
+    web::{self},
     App, HttpRequest, HttpServer,
 };
 use clap::Parser;
@@ -55,7 +55,6 @@ async fn main() -> std::io::Result<()> {
         .unwrap()
         .to_string_lossy()
         .to_string();
-    println!("{:?} {}", path, name);
     let body = format!(
         r"
     <html><head>

@@ -2,8 +2,9 @@
 
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
+use actix_web::dev::Service;
 use actix_web::{
-    http::StatusCode,
+    http::{header::HeaderName, StatusCode},
     web::{self},
     App, HttpRequest, HttpServer,
 };
@@ -77,13 +78,31 @@ async fn main() -> std::io::Result<()> {
     println!("http://{}:{}/", host, port);
 
     HttpServer::new(move || {
-        let mut app = App::new().app_data(web::Data::new(app_data.clone())).wrap(
-            Cors::default()
-                .allow_any_header()
-                .allow_any_method()
-                .allow_any_origin()
-                .max_age(3600),
-        );
+        let mut app = App::new()
+            .app_data(web::Data::new(app_data.clone()))
+            .wrap(
+                Cors::default()
+                    .allow_any_header()
+                    .allow_any_method()
+                    .allow_any_origin()
+                    .max_age(3600),
+            )
+            .wrap_fn(|req, srv| {
+                let fut = srv.call(req);
+                async {
+                    let mut res = fut.await?;
+                    for (k, v) in [
+                        ("Cross-Origin-Embedder-Policy", "require-corp"),
+                        ("Cross-Origin-Opener-Policy", "same-origin"),
+                    ] {
+                        res.headers_mut().insert(
+                            HeaderName::from_bytes(k.as_bytes()).unwrap(),
+                            v.parse().unwrap(),
+                        );
+                    }
+                    Ok(res)
+                }
+            });
 
         if path.is_dir() {
             app = app.service(Files::new("/", path.clone()).show_files_listing())

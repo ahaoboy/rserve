@@ -1,5 +1,4 @@
 #![feature(absolute_path)]
-
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
 use actix_web::dev::Service;
@@ -9,6 +8,10 @@ use actix_web::{
     App, HttpRequest, HttpServer,
 };
 use clap::Parser;
+use fast_qr::{
+    convert::{Builder, Shape},
+    ModuleType, QRBuilder, Version, ECL,
+};
 
 #[derive(Parser, Debug, Clone)]
 #[command(author, version, about, long_about = None)]
@@ -72,10 +75,14 @@ async fn main() -> std::io::Result<()> {
     };
 
     let local_ip = local_ip_address::local_ip().unwrap();
-    println!("rserve:");
-    println!("http://{}:{}/", "localhost", port);
-    println!("http://{}:{}/", local_ip, port);
-    println!("http://{}:{}/", host, port);
+
+    let s1 = format!("http://{}:{}/", "localhost", port);
+    let s2 = format!("http://{}:{}/", local_ip, port);
+    let s3 = format!("http://{}:{}/", host, port);
+
+    println!("rserve:\n{}\n{}\n{}", s1, s2, s3);
+    let qrcode = QRBuilder::new(s2).ecl(ECL::H).build().unwrap();
+    qrcode.print();
 
     HttpServer::new(move || {
         let mut app = App::new()

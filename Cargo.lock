@@ -566,6 +566,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fast_qr"
+version = "0.10.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a155b250cb21f2ee5bff65e15b7144d14863e8f7f8989dd042952d241cd5ca98"
+
+[[package]]
 name = "find_port"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1042,6 +1048,7 @@ dependencies = [
  "actix-files",
  "actix-web",
  "clap",
+ "fast_qr",
  "find_port",
  "local-ip-address",
 ]

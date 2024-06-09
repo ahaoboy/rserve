@@ -1,4 +1,3 @@
-#![feature(absolute_path)]
 use actix_cors::Cors;
 use actix_files::{Files, NamedFile};
 use actix_web::dev::Service;
@@ -8,10 +7,7 @@ use actix_web::{
     App, HttpRequest, HttpServer,
 };
 use clap::Parser;
-use fast_qr::{
-    convert::{Builder, Shape},
-    ModuleType, QRBuilder, Version, ECL,
-};
+use fast_qr::{QRBuilder, ECL};
 
 #[derive(Parser, Debug, Clone)]
 #[command(author, version, about, long_about = None)]
@@ -45,7 +41,7 @@ async fn main() -> std::io::Result<()> {
     } = cli.clone();
     let path = std::path::Path::new(&file_or_dir);
 
-    let path = std::path::absolute(path).unwrap();
+    let path = path.canonicalize().unwrap();
 
     let port = find_port::find_port("127.0.0.1", port).expect("");
 
